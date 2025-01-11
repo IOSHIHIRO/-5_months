@@ -1,7 +1,7 @@
 from django.db import models
 
 class Director(models.Model):
-    name = models.CharField(max_length=100)
+    name = models.CharField(max_length=100, blank=True, null=True)
 
 
     def __str__(self):
@@ -11,7 +11,7 @@ class Movie(models.Model):
     title = models.CharField(max_length=100)
     description = models.CharField(max_length=100)
     duration = models.CharField(max_length=100)
-    director = models.ForeignKey(Director, on_delete=models.CASCADE)
+    director = models.ForeignKey(Director, on_delete=models.CASCADE, blank=True , null=True)
 
     def __str__(self):
         return self.title
@@ -25,7 +25,7 @@ class Review(models.Model):
         ('5', '5')
     )
     test = models.CharField(max_length=100)
-    movie = models.ForeignKey(Movie, on_delete=models.CASCADE, related_name='reviews', null=True)
+    movie = models.ForeignKey(Movie, on_delete=models.CASCADE, related_name='reviews', blank=True, null=True)
     stars = models.CharField(max_length=100, choices=GENRE, null=True)
 
 
