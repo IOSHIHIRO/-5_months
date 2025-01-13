@@ -93,7 +93,7 @@ def reviews_detail_view(request, id):
         return Response(serializer)
     elif request.method == 'PUT':
         review.test = request.data.get('test')
-        review.movie = request.data.get('movie')
+        review.movie_id = request.data.get('movie_id')
         review.stars = request.data.get('stars')
         review.save()
         return Response(data=ReviewSerializer(review).data, status=status.HTTP_201_CREATED)
@@ -110,7 +110,7 @@ def review_list_view(request):
         return Response(data=list_)
     if request.method == 'POST':
         test = request.data.get('test')
-        movie_id = request.data.get('movie')
+        movie_id = request.data.get('movie_id')
         stars = request.data.get('stars')
         search_words = request.data.get('search_words')
 
@@ -119,6 +119,6 @@ def review_list_view(request):
             movie_id=movie_id,
             stars=stars
         )
-        review.search_words.set(search_words)
+        review.search_words = search_words
         review.save()
         return Response(data=ReviewSerializer(review).data, status=status.HTTP_201_CREATED)
