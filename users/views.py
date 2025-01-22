@@ -8,6 +8,7 @@ from rest_framework.authtoken.models import Token
 import random
 from .models import SMScode
 from django.core.mail import send_mail
+from django.db import transaction
 
 @api_view(['POST'])
 def register_api_view(request):
@@ -18,17 +19,17 @@ def register_api_view(request):
     password = serializer.validated_data.get('password')
     email = serializer.validated_data.get('email')
     is_active = False
+    with transaction.atomic():
+        user = User.objects.create_user(username=username, password=password, email=email, is_active=is_active)
+        code = "".join([str(random.randint(0,9)) for i in range(6)])
+        SMScode.objects.create(user=user, sms_code=code)
+        send_mail(
+            'Your code',
+            message=code,
+            from_email='<EMAIL>',
+            recipient_list=[user.email],
 
-    user = User.objects.create_user(username=username, password=password, email=email, is_active=is_active)
-    code = "".join([str(random.randint(0,9)) for i in range(6)])
-    SMScode.objects.create(user=user, code=code)
-    send_mail(
-        'Your code',
-        message=code,
-        from_email='<EMAIL>',
-        recipient_list=[user.email],
-
-    )
+        )
     return Response(data={'user_id': user.id}, status=status.HTTP_201_CREATED)
 
 
@@ -55,8 +56,8 @@ def sms_code_api_view(request):
     serializer.is_valid(raise_exception=True)
     sms_code = serializer.validated_data['sms_code']
     try:
-        sms = SMScode.objects.get(code=sms_code)
-    except:
+        sms = SMScode.objects.get(sms_code=sms_code)
+    except SMScode.DoesNotExist:
         return Response(status=status.HTTP_400_BAD_REQUEST)
     sms.user.is_active = True
     sms.user.save()

@@ -11,7 +11,7 @@ class UserAuthSerializer(UserBaseSerializer):
     pass
 
 class UserRegisterSerializer(UserBaseSerializer):
-    email = serializers.EmailField()
+    # email = serializers.EmailField()
     password_confirm = serializers.CharField(max_length=150)
 
     def validate(self, data):
